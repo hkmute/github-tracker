@@ -1,28 +1,29 @@
 import ReleaseCardList from "@/components/ReleaseCardList";
+import SearchInput from "@/components/SearchInput";
+import { Suspense } from "react";
 
-const repos = [
-  {
-    owner: "vercel",
-    repo: "next.js",
-  },
-  {
-    owner: "remix-run",
-    repo: "remix",
-  },
-  {
-    owner: "nestjs",
-    repo: "nest",
-  },
-  {
-    owner: "facebook",
-    repo: "react",
-  },
-];
+export default function Home({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
+  const q = searchParams.q
+    ? Array.isArray(searchParams.q)
+      ? searchParams.q
+      : [searchParams.q]
+    : [];
 
-export default function Home() {
+  const repos = q.map((item) => {
+    const [owner, repo] = item.split("/");
+    return { owner, repo };
+  });
+
   return (
-    <div className="p-4">
-      <ReleaseCardList repos={repos} />
+    <div className="flex flex-col gap-4 p-4">
+      <SearchInput />
+      <Suspense fallback={<div>Loading...</div>}>
+        <ReleaseCardList repos={repos} />
+      </Suspense>
     </div>
   );
 }
