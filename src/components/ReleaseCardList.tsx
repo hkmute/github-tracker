@@ -32,12 +32,25 @@ const ReleaseCardList = async ({
           `Error fetching release for ${owner}/${repo}:`,
           errorMessage,
         );
-        return null;
+        return {
+          repo: {
+            owner,
+            repo,
+          },
+          error: { message: errorMessage },
+        };
       }
     }),
   );
 
   const sortedReleases = releases.sort((a, b) => {
+    if (a?.error) {
+      return -1;
+    }
+    if (b?.error) {
+      return 1;
+    }
+
     return compareDesc(
       new Date(a?.data.published_at ?? 0),
       new Date(b?.data.published_at ?? 0),

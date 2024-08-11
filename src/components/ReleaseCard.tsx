@@ -26,10 +26,18 @@ type Props = {
       owner: string;
       repo: string;
     };
-    data: Awaited<
-      ReturnType<typeof octokit.rest.repos.getLatestRelease>
-    >["data"];
-  };
+  } & (
+    | {
+        data: Awaited<
+          ReturnType<typeof octokit.rest.repos.getLatestRelease>
+        >["data"];
+      }
+    | {
+        error: {
+          message: string;
+        };
+      }
+  );
 };
 
 const customDirective = () => {
@@ -48,6 +56,24 @@ const customDirective = () => {
 };
 
 const ReleaseCard = async ({ release }: Props) => {
+  if ("error" in release) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            N/A -{" "}
+            <a
+              href={`https://github.com/${release.repo.owner}/${release.repo.repo}`}
+            >{`${release.repo.owner}/${release.repo.repo}`}</a>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>{release.error.message}</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   const isRecent =
     !!release.data.published_at &&
     differenceInWeeks(release.data.published_at, Date.now()) > 1;
