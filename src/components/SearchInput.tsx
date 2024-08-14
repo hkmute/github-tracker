@@ -1,63 +1,49 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { Input } from "./ui/input";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { CircleX } from "lucide-react";
-import { getSavedRepos } from "@/lib/utils";
+import { decodeRepoPath, encodeRepo } from "@/lib/utils";
 
 const SearchInput = () => {
   const ref = useRef<HTMLInputElement>(null);
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const q = searchParams.getAll("q");
+  const params = useParams<{ compare?: string }>();
 
-  useEffect(() => {
-    if (q.length > 0) {
-      return;
-    }
-    const savedRepos = getSavedRepos();
-    if (savedRepos.length) {
-      const params = new URLSearchParams();
-      savedRepos.forEach((repo) => {
-        params.append("q", repo);
-      });
-      const result = params.toString();
-      router.push(`?${result}`);
-    }
-  }, [q.length, router]);
-
-  const repos = q;
+  const repos = decodeRepoPath(params.compare ?? "");
 
   const handleClick = () => {
     if (ref.current && ref.current.value) {
-      const params = new URLSearchParams(searchParams.toString());
-      if (!params.has("q", ref.current.value)) {
-        params.append("q", ref.current.value);
+      const newEncodedRepo = encodeRepo(ref.current.value);
+
+      if (!params.compare?.includes(newEncodedRepo)) {
+        const newPath = params.compare
+          ? params.compare + "--" + newEncodedRepo
+          : newEncodedRepo;
+        localStorage.setItem("repos", newPath);
+        router.push(newPath);
       }
-      const result = params.toString();
-      localStorage.setItem("repos", result);
-      router.push(`?${result}`);
       ref.current.value = "";
     }
   };
 
   const handleDelete = (repo: string) => () => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (params.has("q")) {
-      params.delete("q", repo);
-    } else {
-      repos.forEach((currentRepo) => {
-        if (currentRepo !== repo) {
-          params.append("q", currentRepo);
-        }
-      });
-    }
-    const result = params.toString();
-    localStorage.setItem("repos", result);
-    router.push(`?${result}`);
+    const encodedRepo = encodeRepo(repo);
+    const newPath =
+      ("--" + params.compare + "--")
+        .replace("--" + encodedRepo, "")
+        .replace(/--$/, "")
+        .replace(/^--/, "") || "/";
+    localStorage.setItem("repos", newPath);
+    router.push(newPath);
+  };
+
+  const handleClearAll = () => {
+    localStorage.setItem("repos", "/");
+    router.push("/");
   };
 
   return (
@@ -66,21 +52,26 @@ const SearchInput = () => {
         <Input ref={ref} />
         <Button onClick={handleClick}>Add</Button>
       </div>
-      <div className="flex gap-2">
-        {repos.map((repo, index) => (
-          <Badge key={index} className="flex items-center gap-0.5">
-            {repo}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-5 w-5 hover:bg-transparent"
-              onClick={handleDelete(repo)}
-            >
-              <CircleX className="h-4 w-4" />
-            </Button>
-          </Badge>
-        ))}
-      </div>
+      {!!repos.length && (
+        <div className="flex items-center gap-2">
+          {repos.map((repo, index) => (
+            <Badge key={index} className="flex items-center gap-0.5">
+              {repo}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-5 w-5 hover:bg-transparent"
+                onClick={handleDelete(repo)}
+              >
+                <CircleX className="h-4 w-4" />
+              </Button>
+            </Badge>
+          ))}
+          <Button size="sm" variant="ghost" onClick={handleClearAll}>
+            Clear All
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

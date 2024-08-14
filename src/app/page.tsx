@@ -1,29 +1,23 @@
-import ReleaseCardList from "@/components/ReleaseCardList";
+"use client";
+
 import SearchInput from "@/components/SearchInput";
-import { Suspense } from "react";
+import { getSavedReposPath } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-export default function Home({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
-  const q = searchParams.q
-    ? Array.isArray(searchParams.q)
-      ? searchParams.q
-      : [searchParams.q]
-    : [];
+export default function Home() {
+  const router = useRouter();
 
-  const repos = q.map((item) => {
-    const [owner, repo] = item.split("/");
-    return { owner, repo };
-  });
+  useEffect(() => {
+    const savedReposPath = getSavedReposPath();
+    if (savedReposPath !== "/") {
+      router.push(savedReposPath);
+    }
+  }, [router]);
 
   return (
     <div className="flex flex-col gap-4 p-4">
       <SearchInput />
-      <Suspense fallback={<div>Loading...</div>}>
-        <ReleaseCardList repos={repos} />
-      </Suspense>
     </div>
   );
 }

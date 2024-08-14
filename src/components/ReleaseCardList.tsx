@@ -37,7 +37,7 @@ const ReleaseCardList = async ({
             owner,
             repo,
           },
-          error: { message: errorMessage },
+          error: { message: "Unable to get information" },
         };
       }
     }),
