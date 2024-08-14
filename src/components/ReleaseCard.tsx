@@ -19,6 +19,8 @@ import List from "./typography/List";
 import { Button } from "./ui/button";
 import { differenceInWeeks, format, formatDistanceToNow } from "date-fns";
 import { Badge } from "./ui/badge";
+import { ErrorBoundary } from "next/dist/client/components/error-boundary";
+import { Suspense } from "react";
 
 type Props = {
   release: {
@@ -78,6 +80,37 @@ const ReleaseCard = async ({ release }: Props) => {
     !!release.data.published_at &&
     differenceInWeeks(release.data.published_at, Date.now()) > 1;
 
+  const MDX = async () => {
+    try {
+      return await MDXRemote({
+        source: release.data.body || "",
+        options: {
+          mdxOptions: {
+            remarkPlugins: [customDirective],
+          },
+        },
+        components: {
+          h1: H1,
+          h2: H2,
+          h3: H3,
+          h4: H4,
+          p: P,
+          blockquote: Blockquote,
+          ul: List,
+        },
+      });
+    } catch (error) {
+      return (
+        <>
+          {error instanceof Error && (
+            <p className="text-red-600">{error.message}</p>
+          )}
+          <p className="whitespace-pre-wrap">{release.data.body}</p>
+        </>
+      );
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -99,23 +132,7 @@ const ReleaseCard = async ({ release }: Props) => {
         )}
       </CardHeader>
       <CardContent>
-        <MDXRemote
-          source={release.data.body || ""}
-          options={{
-            mdxOptions: {
-              remarkPlugins: [customDirective],
-            },
-          }}
-          components={{
-            h1: H1,
-            h2: H2,
-            h3: H3,
-            h4: H4,
-            p: P,
-            blockquote: Blockquote,
-            ul: List,
-          }}
-        />
+        <MDX />
         {/* <p className="whitespace-pre">
             {JSON.stringify(release.data, null, 2)}
           </p> */}

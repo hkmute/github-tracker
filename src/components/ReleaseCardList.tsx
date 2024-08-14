@@ -37,7 +37,9 @@ const ReleaseCardList = async ({
             owner,
             repo,
           },
-          error: { message: "Unable to get information" },
+          error: {
+            message: `Unable to get information ${errorMessage.includes("API rate limit exceeded") && "(Rate limited)"}`,
+          },
         };
       }
     }),

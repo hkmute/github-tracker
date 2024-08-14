@@ -1,33 +1,51 @@
 "use client";
 
-import { useRef } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { Input } from "./ui/input";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { CircleX } from "lucide-react";
 import { decodeRepoPath, encodeRepo } from "@/lib/utils";
 
-const SearchInput = () => {
+type Props = {
+  searchResults: ReactNode;
+};
+
+const SearchInput = ({ searchResults }: Props) => {
   const ref = useRef<HTMLInputElement>(null);
+  const searchResultRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const params = useParams<{ compare?: string }>();
+  const searchParams = useSearchParams();
+  const [open, setOpen] = useState(false);
+  const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
 
   const repos = decodeRepoPath(params.compare ?? "");
 
-  const handleClick = () => {
-    if (ref.current && ref.current.value) {
-      const newEncodedRepo = encodeRepo(ref.current.value);
-
-      if (!params.compare?.includes(newEncodedRepo)) {
-        const newPath = params.compare
-          ? params.compare + "--" + newEncodedRepo
-          : newEncodedRepo;
-        localStorage.setItem("repos", newPath);
-        router.push(newPath);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchResultRef.current &&
+        !searchResultRef.current.contains(event.target as Node)
+      ) {
+        setOpen(false);
       }
-      ref.current.value = "";
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (timer) {
+      clearTimeout(timer);
     }
+    const newTimer = setTimeout(() => {
+      router.push("?q=" + event.target.value);
+      setOpen(true);
+    }, 500);
+    setTimer(newTimer);
   };
 
   const handleDelete = (repo: string) => () => {
@@ -48,10 +66,23 @@ const SearchInput = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex gap-2">
-        <Input ref={ref} />
-        <Button onClick={handleClick}>Add</Button>
+      <div className="relative flex gap-2">
+        <Input
+          ref={ref}
+          placeholder="Search for a repository"
+          defaultValue={searchParams.get("q") ?? ""}
+          onChange={handleChange}
+        />
+        {open && (
+          <div
+            ref={searchResultRef}
+            className="absolute top-full w-full py-2 backdrop-blur-sm"
+          >
+            {searchResults}
+          </div>
+        )}
       </div>
+
       {!!repos.length && (
         <div className="flex items-center gap-2">
           {repos.map((repo, index) => (
