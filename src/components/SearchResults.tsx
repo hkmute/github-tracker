@@ -9,6 +9,7 @@ const SearchResults = async ({ search }: Props) => {
   if (!search) {
     return null;
   }
+
   try {
     const result = await octokit.rest.search.repos({
       q: search,
@@ -16,6 +17,11 @@ const SearchResults = async ({ search }: Props) => {
       order: "desc",
       per_page: 10,
     });
+
+    if (!result.data.items.length) {
+      return <div className="w-full">No results found</div>;
+    }
+
     return (
       <div>
         {result.data.items.map((item) => (

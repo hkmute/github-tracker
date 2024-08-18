@@ -25,6 +25,11 @@ const DEFAULT_REPOS = [
   "remix-run/remix",
   "nestjs/nest",
   "facebook/react",
+  "tailwindlabs/tailwindcss",
+  "prisma/prisma",
+  "microsoft/TypeScript",
+  "mui/material-ui",
+  "nextui-org/nextui",
 ];
 
 const DEFAULT_REPOS_URL_PATH = DEFAULT_REPOS.reduce((acc, repo) => {

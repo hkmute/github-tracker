@@ -42,10 +42,14 @@ const SearchInput = ({ searchResults }: Props) => {
       clearTimeout(timer);
     }
     const newTimer = setTimeout(() => {
-      router.push("?q=" + event.target.value);
+      router.push("?q=" + encodeURIComponent(event.target.value));
       setOpen(true);
     }, 500);
     setTimer(newTimer);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
   };
 
   const handleDelete = (repo: string) => () => {
@@ -76,7 +80,8 @@ const SearchInput = ({ searchResults }: Props) => {
         {open && (
           <div
             ref={searchResultRef}
-            className="absolute top-full w-full py-2 backdrop-blur-sm"
+            className="absolute top-full mt-1 w-full rounded bg-background/75 py-2 backdrop-blur-sm"
+            onClick={handleClose}
           >
             {searchResults}
           </div>
@@ -84,7 +89,7 @@ const SearchInput = ({ searchResults }: Props) => {
       </div>
 
       {!!repos.length && (
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {repos.map((repo, index) => (
             <Badge key={index} className="flex items-center gap-0.5">
               {repo}
