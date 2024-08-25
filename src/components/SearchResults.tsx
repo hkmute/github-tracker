@@ -19,11 +19,11 @@ const SearchResults = async ({ search }: Props) => {
     });
 
     if (!result.data.items.length) {
-      return <div className="w-full">No results found</div>;
+      return <div className="w-full p-2">No results found</div>;
     }
 
     return (
-      <div>
+      <div className="w-full p-2">
         {result.data.items.map((item) => (
           <SearchResultButton key={item.id} repo={item.full_name} />
         ))}
@@ -34,7 +34,7 @@ const SearchResults = async ({ search }: Props) => {
       error instanceof Error ? error.message : "Unexpected error";
     console.error("Error fetching search results:", errorMessage);
     return (
-      <div className="w-full">
+      <div className="w-full p-2">
         Error fetching search results.
         {errorMessage.includes("API rate limit exceeded") && " (Rate limited)"}
       </div>

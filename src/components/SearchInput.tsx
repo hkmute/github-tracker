@@ -80,7 +80,7 @@ const SearchInput = ({ searchResults }: Props) => {
         {open && (
           <div
             ref={searchResultRef}
-            className="absolute top-full mt-1 w-full rounded bg-background/75 py-2 backdrop-blur-sm"
+            className="absolute top-full mt-1 w-full rounded bg-background/75 backdrop-blur-sm"
             onClick={handleClose}
           >
             {searchResults}
