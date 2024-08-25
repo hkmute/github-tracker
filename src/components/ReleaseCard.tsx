@@ -78,7 +78,7 @@ const ReleaseCard = async ({ release }: Props) => {
 
   const isRecent =
     !!release.data.published_at &&
-    differenceInWeeks(release.data.published_at, Date.now()) > 1;
+    differenceInWeeks(Date.now(), release.data.published_at) < 1;
 
   const MDX = async () => {
     try {
