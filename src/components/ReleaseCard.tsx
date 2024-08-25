@@ -16,11 +16,10 @@ import H4 from "./typography/H4";
 import P from "./typography/P";
 import Blockquote from "./typography/Blockquote";
 import List from "./typography/List";
+import Pre from "./typography/Pre";
 import { Button } from "./ui/button";
 import { differenceInWeeks, format, formatDistanceToNow } from "date-fns";
 import { Badge } from "./ui/badge";
-import { ErrorBoundary } from "next/dist/client/components/error-boundary";
-import { Suspense } from "react";
 
 type Props = {
   release: {
@@ -97,6 +96,7 @@ const ReleaseCard = async ({ release }: Props) => {
           p: P,
           blockquote: Blockquote,
           ul: List,
+          pre: Pre,
         },
       });
     } catch (error) {
@@ -114,12 +114,14 @@ const ReleaseCard = async ({ release }: Props) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="sm:item-center flex flex-col items-start gap-2 sm:flex-row">
           {isRecent && <Badge variant="destructive">New</Badge>}
-          {release.data.name || release.data.tag_name} -{" "}
-          <a
-            href={`https://github.com/${release.repo.owner}/${release.repo.repo}`}
-          >{`${release.repo.owner}/${release.repo.repo}`}</a>
+          <span className="overflow-hidden break-words">
+            {release.data.name || release.data.tag_name} -{" "}
+            <a
+              href={`https://github.com/${release.repo.owner}/${release.repo.repo}`}
+            >{`${release.repo.owner}/${release.repo.repo}`}</a>
+          </span>
         </CardTitle>
         {release.data.published_at && (
           <CardDescription>
@@ -131,7 +133,7 @@ const ReleaseCard = async ({ release }: Props) => {
           </CardDescription>
         )}
       </CardHeader>
-      <CardContent>
+      <CardContent className="break-words">
         <MDX />
         {/* <p className="whitespace-pre">
             {JSON.stringify(release.data, null, 2)}
