@@ -27,8 +27,10 @@ const DEFAULT_REPOS = [
   "facebook/react",
   "tailwindlabs/tailwindcss",
   "prisma/prisma",
+  "drizzle-team/drizzle-orm",
   "microsoft/TypeScript",
   "mui/material-ui",
+  "mui/mui-x",
   "nextui-org/nextui",
 ];
 
