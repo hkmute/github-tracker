@@ -32,6 +32,7 @@ const DEFAULT_REPOS = [
   "mui/material-ui",
   "mui/mui-x",
   "nextui-org/nextui",
+  "microsoft/playwright",
 ];
 
 const DEFAULT_REPOS_URL_PATH = DEFAULT_REPOS.reduce((acc, repo) => {
