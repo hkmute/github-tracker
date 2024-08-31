@@ -1,4 +1,3 @@
-import octokit from "@/lib/octokit";
 import {
   Card,
   CardContent,
@@ -7,53 +6,14 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import { MDXRemote } from "next-mdx-remote/rsc";
-import { visit } from "unist-util-visit";
-import H1 from "./typography/H1";
-import H2 from "./typography/H2";
-import H3 from "./typography/H3";
-import H4 from "./typography/H4";
-import P from "./typography/P";
-import Blockquote from "./typography/Blockquote";
-import List from "./typography/List";
-import Pre from "./typography/Pre";
 import { Button } from "./ui/button";
 import { differenceInWeeks, format, formatDistanceToNow } from "date-fns";
 import { Badge } from "./ui/badge";
+import { Release } from "@/lib/types";
+import MDX from "./MDX";
 
 type Props = {
-  release: {
-    repo: {
-      owner: string;
-      repo: string;
-    };
-  } & (
-    | {
-        data: Awaited<
-          ReturnType<typeof octokit.rest.repos.getLatestRelease>
-        >["data"];
-      }
-    | {
-        error: {
-          message: string;
-        };
-      }
-  );
-};
-
-const customDirective = () => {
-  return (tree: any) => {
-    visit(tree, "paragraph", (node) => {
-      const { children } = node;
-      if (children && children[0] && children[0].type === "text") {
-        const text = children[0].value;
-        const match = text.match(/^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/);
-        if (match) {
-          node.children = node.children.slice(2);
-        }
-      }
-    });
-  };
+  release: Release;
 };
 
 const ReleaseCard = async ({ release }: Props) => {
@@ -79,38 +39,6 @@ const ReleaseCard = async ({ release }: Props) => {
     !!release.data.published_at &&
     differenceInWeeks(Date.now(), release.data.published_at) < 1;
 
-  const MDX = async () => {
-    try {
-      return await MDXRemote({
-        source: release.data.body || "",
-        options: {
-          mdxOptions: {
-            remarkPlugins: [customDirective],
-          },
-        },
-        components: {
-          h1: H1,
-          h2: H2,
-          h3: H3,
-          h4: H4,
-          p: P,
-          blockquote: Blockquote,
-          ul: List,
-          pre: Pre,
-        },
-      });
-    } catch (error) {
-      return (
-        <>
-          {error instanceof Error && (
-            <p className="text-red-600">{error.message}</p>
-          )}
-          <p className="whitespace-pre-wrap">{release.data.body}</p>
-        </>
-      );
-    }
-  };
-
   return (
     <Card>
       <CardHeader>
@@ -134,10 +62,7 @@ const ReleaseCard = async ({ release }: Props) => {
         )}
       </CardHeader>
       <CardContent className="break-words">
-        <MDX />
-        {/* <p className="whitespace-pre">
-            {JSON.stringify(release.data, null, 2)}
-          </p> */}
+        <MDX source={release.data.body} />
       </CardContent>
       <CardFooter>
         <Button variant="secondary" asChild>
