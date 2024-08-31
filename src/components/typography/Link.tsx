@@ -6,7 +6,12 @@ const Link = ({
   href?: string;
 }) => {
   return (
-    <a className="text-blue-500 hover:underline underline-offset-4" href={href}>
+    <a
+      className="text-blue-500 underline-offset-4 hover:underline"
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+    >
       {children}
     </a>
   );
