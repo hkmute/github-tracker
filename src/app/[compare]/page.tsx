@@ -4,13 +4,19 @@ import SearchResults from "@/components/SearchResults";
 import { decodeRepoPath } from "@/lib/utils";
 import { Suspense } from "react";
 
-const ComparePage = ({
-  params: { compare },
-  searchParams,
-}: {
-  params: { compare: string };
-  searchParams: { [key: string]: string | string[] | undefined };
-}) => {
+const ComparePage = async (
+  props: {
+    params: Promise<{ compare: string }>;
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  }
+) => {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
+
+  const {
+    compare
+  } = params;
+
   const repos = decodeRepoPath(compare).map((item) => {
     const [owner, repo] = item.split("/");
     return {

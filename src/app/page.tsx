@@ -4,13 +4,14 @@ import SearchInput from "@/components/SearchInput";
 import SearchResults from "@/components/SearchResults";
 import { getSavedReposPath } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, use } from "react";
 
-export default function Home({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
+export default function Home(
+  props: {
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  }
+) {
+  const searchParams = use(props.searchParams);
   const router = useRouter();
 
   useEffect(() => {

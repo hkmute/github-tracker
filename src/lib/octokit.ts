@@ -9,6 +9,7 @@ const octokit = new Octokit({
       fetch(url, {
         ...options,
         ...{
+          cache: "force-cache",
           next: {
             revalidate: 3600,
           },
