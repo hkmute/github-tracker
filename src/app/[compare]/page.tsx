@@ -28,7 +28,7 @@ const ComparePage = async (
   const search = searchParams.q as string;
 
   return (
-    <div className="flex flex-col gap-4 p-4">
+    <div className="flex flex-col gap-2 p-4">
       <SearchInput
         searchResults={
           <Suspense fallback={<div>Loading...</div>}>

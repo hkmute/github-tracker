@@ -94,9 +94,9 @@ const SearchInput = ({ searchResults }: Props) => {
       </div>
 
       {
-        <div className="flex flex-wrap items-center gap-2">
+        <div>
           {!!repos.length && (
-            <>
+            <div className="flex flex-wrap items-center gap-2">
               {repos.map((repo, index) => (
                 <Badge key={index} className="flex items-center gap-0.5">
                   {repo}
@@ -110,14 +110,18 @@ const SearchInput = ({ searchResults }: Props) => {
                   </Button>
                 </Badge>
               ))}
+            </div>
+          )}
+          <div className="text-end">
+            {!!repos.length && (
               <Button size="sm" variant="ghost" onClick={handleClearAll}>
                 Clear All
               </Button>
-            </>
-          )}
-          <Button size="sm" variant="ghost" onClick={handleResetToDefault}>
-            Reset to Default
-          </Button>
+            )}
+            <Button size="sm" variant="ghost" onClick={handleResetToDefault}>
+              Reset to Default
+            </Button>
+          </div>
         </div>
       }
     </div>
