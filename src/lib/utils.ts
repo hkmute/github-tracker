@@ -33,7 +33,11 @@ const DEFAULT_REPOS = [
   "mui/mui-x",
   "nextui-org/nextui",
   "microsoft/playwright",
-];
+  "remix-run/react-router",
+].sort(
+  (a, b) =>
+    a.split("/")[0].localeCompare(b.split("/")[0]) || a.localeCompare(b),
+);
 
 const DEFAULT_REPOS_URL_PATH = DEFAULT_REPOS.reduce((acc, repo) => {
   const encodedRepo = encodeRepo(repo);

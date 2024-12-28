@@ -6,7 +6,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { CircleX } from "lucide-react";
-import { decodeRepoPath, encodeRepo } from "@/lib/utils";
+import { decodeRepoPath, encodeRepo, getSavedReposPath } from "@/lib/utils";
 
 type Props = {
   searchResults: ReactNode;
@@ -68,6 +68,11 @@ const SearchInput = ({ searchResults }: Props) => {
     router.push("/");
   };
 
+  const handleResetToDefault = () => {
+    localStorage.removeItem("repos");
+    router.push(getSavedReposPath());
+  };
+
   return (
     <div className="flex flex-col gap-2">
       <div className="relative flex gap-2">
@@ -88,26 +93,33 @@ const SearchInput = ({ searchResults }: Props) => {
         )}
       </div>
 
-      {!!repos.length && (
+      {
         <div className="flex flex-wrap items-center gap-2">
-          {repos.map((repo, index) => (
-            <Badge key={index} className="flex items-center gap-0.5">
-              {repo}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-5 w-5 hover:bg-transparent"
-                onClick={handleDelete(repo)}
-              >
-                <CircleX className="h-4 w-4" />
+          {!!repos.length && (
+            <>
+              {repos.map((repo, index) => (
+                <Badge key={index} className="flex items-center gap-0.5">
+                  {repo}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-5 w-5 hover:bg-transparent"
+                    onClick={handleDelete(repo)}
+                  >
+                    <CircleX className="h-4 w-4" />
+                  </Button>
+                </Badge>
+              ))}
+              <Button size="sm" variant="ghost" onClick={handleClearAll}>
+                Clear All
               </Button>
-            </Badge>
-          ))}
-          <Button size="sm" variant="ghost" onClick={handleClearAll}>
-            Clear All
+            </>
+          )}
+          <Button size="sm" variant="ghost" onClick={handleResetToDefault}>
+            Reset to Default
           </Button>
         </div>
-      )}
+      }
     </div>
   );
 };
