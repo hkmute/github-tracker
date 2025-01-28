@@ -9,15 +9,15 @@ export const decodeRepoPath = (path: string) => {
   if (!path) {
     return [];
   }
-  return path.split("--").map((item) => {
-    const [name, owner] = decodeURIComponent(item).split("@");
+  return path.split("---").map((item) => {
+    const [owner, name] = decodeURIComponent(item).split("--");
     return `${owner}/${name}`;
   });
 };
 
 export const encodeRepo = (repo: string) => {
   const [owner, name] = repo.split("/");
-  return encodeURIComponent(name + "@" + owner);
+  return encodeURIComponent(owner + "--" + name);
 };
 
 const DEFAULT_REPOS = [
@@ -34,6 +34,7 @@ const DEFAULT_REPOS = [
   "nextui-org/nextui",
   "microsoft/playwright",
   "remix-run/react-router",
+  "heroui-inc/heroui",
 ].sort(
   (a, b) =>
     a.split("/")[0].localeCompare(b.split("/")[0]) || a.localeCompare(b),
@@ -45,7 +46,7 @@ const DEFAULT_REPOS_URL_PATH = DEFAULT_REPOS.reduce((acc, repo) => {
     return encodedRepo;
   }
 
-  return acc + "--" + encodedRepo;
+  return acc + "---" + encodedRepo;
 }, "");
 
 export const getSavedReposPath = () => {
